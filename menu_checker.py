@@ -8,6 +8,7 @@ import requests
 from bs4 import BeautifulSoup
 import xml.etree.ElementTree as ET
 import argparse
+import re
 
 
 def check_menu_for_target_dishes(verbose=False):
@@ -59,14 +60,58 @@ def check_menu_for_target_dishes(verbose=False):
         return False
 
 
+def get_xml_url(verbose=False):
+    """
+    Extract the current XML feed URL from the restaurant's webpage JavaScript.
+    Returns the XML URL or None if not found.
+    """
+    try:
+        main_url = "https://heatrestauranger.se/lunch-heat-stockholm-asplunden/#veckans-lunchmeny"
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        }
+        
+        if verbose:
+            print("Hämtar XML-URL från huvudsidan...")
+            
+        response = requests.get(main_url, headers=headers)
+        response.raise_for_status()
+        
+        # Look for the XML URL in the JavaScript
+        xml_pattern = r'url:"(https://castit\.nu/xml/posts\.php[^"]+)"'
+        match = re.search(xml_pattern, response.text)
+        
+        if match:
+            xml_url = match.group(1)
+            if verbose:
+                print(f"Hittade XML-URL: {xml_url}")
+            return xml_url
+        else:
+            if verbose:
+                print("Kunde inte hitta XML-URL i JavaScript")
+            return None
+            
+    except Exception as e:
+        if verbose:
+            print(f"Fel vid hämtning av XML-URL: {e}")
+        return None
+
 def parse_daily_menus(verbose=False):
     """
     Parse the XML endpoint to extract menu items for each weekday.
     Returns dict with weekday -> list of menu items.
     """
     try:
-        # The XML endpoint discovered from the JavaScript
-        xml_url = "https://castit.nu/xml/posts.php?c=72&h=a800e34fa2c8f36034180c3f29eedd73&ct=58&s=945"
+        # Get the current XML URL dynamically
+        xml_url = get_xml_url(verbose)
+        if not xml_url:
+            if verbose:
+                print("Kunde inte hämta XML-URL, använder fallback...")
+            # Fallback to the known URL (might be stale)
+            xml_url = "https://castit.nu/xml/posts.php?c=72&h=a800e34fa2c8f36034180c3f29eedd73&ct=58&s=945"
+        
+        if verbose:
+            print(f"Använder XML-URL: {xml_url}")
         
         # Fetch the XML data
         headers = {

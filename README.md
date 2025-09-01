@@ -47,10 +47,21 @@ python menu_checker.py -v
 
 ## How it works
 
-1. Fetches the weekly lunch menu from the restaurant's XML endpoint
-2. Parses XML data to extract menu items for each weekday (Måndag through Fredag)
-3. Searches for "pannkakor" and "stuvade makaroner" in each day's menu
-4. Returns `True` if both dishes are found on the same day, `False` otherwise
+1. Dynamically extracts the current XML feed URL from the restaurant's main webpage
+2. Fetches the weekly lunch menu from the discovered XML endpoint  
+3. Parses XML data to extract menu items for each weekday (Måndag through Fredag)
+4. Searches for "pannkakor" and "stuvade makaroner" in each day's menu
+5. Returns `True` if both dishes are found on the same day, `False` otherwise
+
+## 🤖 Automated Checking
+
+This project includes a GitHub Actions workflow that automatically checks for your "Min Stora Dag" every Monday at 08:30 Stockholm time. When both dishes are found on the same day, it creates a celebratory GitHub issue to notify you!
+
+**Features:**
+- Runs automatically every Monday morning
+- Creates excited GitHub issues when both dishes are served  
+- Handles Swedish timezone automatically
+- Can be triggered manually for testing
 
 ## Testing
 
