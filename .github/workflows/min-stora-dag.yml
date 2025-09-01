@@ -75,36 +75,34 @@ jobs:
           const week = '${{ steps.week.outputs.week }}';
           const year = '${{ steps.week.outputs.year }}';
           const stockholmTime = '${{ steps.week.outputs.stockholm_time }}';
-          
           const perfectDay = '${{ steps.check.outputs.perfect_day }}';
-          const dishes = `${{ steps.check.outputs.dishes }}`;
-          const dishList = dishes.split('\n').filter(d => d.trim()).map(d => `- ${d}`).join('\n');
+          const dishes = '${{ steps.check.outputs.dishes }}';
+          
+          // Build the dish list
+          const dishLines = dishes.split('\n').filter(d => d.trim()).map(d => '- ' + d).join('\n');
+          
+          // Create the issue body
+          let issueBody = '# 🥞✨ DET ÄR DIN STORA DAG! ✨🧀\n\n';
+          issueBody += 'Fantastiska nyheter! På **' + perfectDay + '** denna vecka serveras både **pannkakor** OCH **stuvade makaroner** samma dag på Heat restaurang!\n\n';
+          issueBody += '## 🍽️ Alla rätter på ' + perfectDay + ':\n';
+          issueBody += dishLines + '\n\n';
+          issueBody += '## 📅 Information\n';
+          issueBody += '- **Perfekta dagen:** ' + perfectDay + '\n';
+          issueBody += '- **Vecka:** ' + week + ', ' + year + '\n';
+          issueBody += '- **Kontrollerat:** ' + stockholmTime + '\n';
+          issueBody += '- **Status:** Båda favoriträtterna hittades samma dag! 🎊\n\n';
+          issueBody += '## 🏃‍♂️ Nästa steg\n';
+          issueBody += 'Det är dags att boka din lunch på ' + perfectDay + '! Denna magiska kombination händer inte så ofta.\n\n';
+          issueBody += 'Ring Heat restaurang och boka bord:\n';
+          issueBody += '- **Telefon:** [Heat Stockholm Asplunden](https://heatrestauranger.se/lunch-heat-stockholm-asplunden/)\n\n';
+          issueBody += '---\n';
+          issueBody += '*Automatiskt genererat av Min Stora Dag workflow* 🤖';
           
           await github.rest.issues.create({
             owner: context.repo.owner,
             repo: context.repo.repo,
-            title: `🎉 MIN STORA DAG! - ${perfectDay}, Vecka ${week} ${year}`,
-            body: `# 🥞✨ DET ÄR DIN STORA DAG! ✨🧀
-
-Fantastiska nyheter! På **${perfectDay}** denna vecka serveras både **pannkakor** OCH **stuvade makaroner** samma dag på Heat restaurang!
-
-## 🍽️ Alla rätter på ${perfectDay}:
-${dishList}
-
-## 📅 Information
-- **Perfekta dagen:** ${perfectDay}
-- **Vecka:** ${week}, ${year}
-- **Kontrollerat:** ${stockholmTime}
-- **Status:** Båda favoriträtterna hittades samma dag! 🎊
-
-## 🏃‍♂️ Nästa steg
-Det är dags att boka din lunch på ${perfectDay}! Denna magiska kombination händer inte så ofta.
-
-Ring Heat restaurang och boka bord:
-- **Telefon:** [Heat Stockholm Asplunden](https://heatrestauranger.se/lunch-heat-stockholm-asplunden/)
-
----
-*Automatiskt genererat av Min Stora Dag workflow* 🤖`,
+            title: '🎉 MIN STORA DAG! - ' + perfectDay + ', Vecka ' + week + ' ' + year,
+            body: issueBody,
             labels: ['min-stora-dag', 'celebration', 'lunch-alert', perfectDay.toLowerCase()]
           });
     
