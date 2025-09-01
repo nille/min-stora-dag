@@ -55,10 +55,10 @@ python menu_checker.py -v
 
 ## 🤖 Automated Checking
 
-This project includes a GitHub Actions workflow that automatically checks for your "Min Stora Dag" every Monday at 08:30 Stockholm time. When both dishes are found on the same day, it creates a celebratory GitHub issue to notify you!
+This project includes a GitHub Actions workflow that automatically checks for your "Min Stora Dag" every day at 08:30 Stockholm time. When both dishes are found on the same day, it creates a celebratory GitHub issue to notify you!
 
 **Features:**
-- Runs automatically every Monday morning
+- Runs automatically every morning
 - Creates excited GitHub issues when both dishes are served  
 - Handles Swedish timezone automatically
 - Can be triggered manually for testing

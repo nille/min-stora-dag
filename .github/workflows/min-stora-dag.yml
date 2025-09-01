@@ -2,8 +2,8 @@ name: Min Stora Dag Checker
 
 on:
   schedule:
-    # Runs every Monday at 07:30 UTC (08:30 CET, 09:30 CEST during daylight saving)
-    - cron: '30 7 * * 1'
+    # Runs every day at 07:30 UTC (08:30 CET, 09:30 CEST during daylight saving)
+    - cron: '30 7 * * *'
   workflow_dispatch: # Allow manual trigger for testing
 
 jobs:
@@ -111,5 +111,5 @@ Ring Heat restaurang och boka bord:
     - name: Log when no perfect day found
       if: steps.check.outputs.result == 'False'
       run: |
-        echo "😔 Ingen Min Stora Dag denna vecka... men hoppet lever!"
+        echo "😔 Ingen Min Stora Dag idag... men hoppet lever!"
         echo "Fortsätter att leta efter den perfekta kombinationen av pannkakor och stuvade makaroner."
