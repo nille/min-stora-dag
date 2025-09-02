@@ -2,8 +2,8 @@ name: Min Stora Dag Checker
 
 on:
   schedule:
-    # Runs every day at 07:30 UTC (08:30 CET, 09:30 CEST during daylight saving)
-    - cron: '30 7 * * *'
+    # Runs every day at 06:30 UTC (07:30 CET, 08:30 CEST during daylight saving)
+    - cron: '30 6 * * *'
   workflow_dispatch: # Allow manual trigger for testing
 
 jobs:
@@ -67,6 +67,74 @@ jobs:
         echo "year=$year" >> $GITHUB_OUTPUT
         echo "stockholm_time=$stockholm_time" >> $GITHUB_OUTPUT
     
+    - name: Send Slack notification when both dishes found
+      if: steps.check.outputs.result == 'True'
+      uses: slackapi/slack-github-action@v1.27.0
+      with:
+        payload: |
+          {
+            "text": "🥞✨ MIN STORA DAG! ✨🧀",
+            "blocks": [
+              {
+                "type": "header",
+                "text": {
+                  "type": "plain_text",
+                  "text": "🥞✨ MIN STORA DAG! ✨🧀"
+                }
+              },
+              {
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "Fantastiska nyheter! På *${{ steps.check.outputs.perfect_day }}* denna vecka serveras både *pannkakor* OCH *stuvade makaroner* samma dag på Heat restaurang! 🎊"
+                }
+              },
+              {
+                "type": "section",
+                "fields": [
+                  {
+                    "type": "mrkdwn",
+                    "text": "*Perfekta dagen:*\n${{ steps.check.outputs.perfect_day }}"
+                  },
+                  {
+                    "type": "mrkdwn",
+                    "text": "*Vecka:*\n${{ steps.week.outputs.week }}, ${{ steps.week.outputs.year }}"
+                  },
+                  {
+                    "type": "mrkdwn",
+                    "text": "*Kontrollerat:*\n${{ steps.week.outputs.stockholm_time }}"
+                  },
+                  {
+                    "type": "mrkdwn",
+                    "text": "*Nästa steg:*\nRing Heat och boka bord! 🏃‍♂️"
+                  }
+                ]
+              },
+              {
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "🍽️ *Alla rätter på ${{ steps.check.outputs.perfect_day }}:*\n${{ steps.check.outputs.dishes }}"
+                }
+              },
+              {
+                "type": "actions",
+                "elements": [
+                  {
+                    "type": "button",
+                    "text": {
+                      "type": "plain_text",
+                      "text": "📞 Heat Stockholm Asplunden"
+                    },
+                    "url": "https://heatrestauranger.se/lunch-heat-stockholm-asplunden/"
+                  }
+                ]
+              }
+            ]
+          }
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+    
     - name: Create celebratory issue when both dishes found
       if: steps.check.outputs.result == 'True'
       uses: actions/github-script@v7
@@ -105,6 +173,35 @@ jobs:
             body: issueBody,
             labels: ['min-stora-dag', 'celebration', 'lunch-alert', perfectDay.toLowerCase()]
           });
+    
+    - name: Send Slack notification when no match found
+      if: steps.check.outputs.result == 'False' && vars.SLACK_NOTIFY_NO_MATCH == 'true'
+      uses: slackapi/slack-github-action@v1.27.0
+      with:
+        payload: |
+          {
+            "text": "😔 Ingen Min Stora Dag idag",
+            "blocks": [
+              {
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "😔 Ingen Min Stora Dag idag... men hoppet lever!\n\nFortsätter att leta efter den perfekta kombinationen av *pannkakor* och *stuvade makaroner*."
+                }
+              },
+              {
+                "type": "context",
+                "elements": [
+                  {
+                    "type": "mrkdwn",
+                    "text": "Vecka ${{ steps.week.outputs.week }}, ${{ steps.week.outputs.year }} | Kontrollerat: ${{ steps.week.outputs.stockholm_time }}"
+                  }
+                ]
+              }
+            ]
+          }
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
     
     - name: Log when no perfect day found
       if: steps.check.outputs.result == 'False'
