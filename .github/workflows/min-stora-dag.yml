@@ -180,25 +180,7 @@ jobs:
       with:
         payload: |
           {
-            "text": "😔 Ingen Min Stora Dag idag",
-            "blocks": [
-              {
-                "type": "section",
-                "text": {
-                  "type": "mrkdwn",
-                  "text": "😔 Ingen Min Stora Dag idag... men hoppet lever!\n\nFortsätter att leta efter den perfekta kombinationen av *pannkakor* och *stuvade makaroner*."
-                }
-              },
-              {
-                "type": "context",
-                "elements": [
-                  {
-                    "type": "mrkdwn",
-                    "text": "Vecka ${{ steps.week.outputs.week }}, ${{ steps.week.outputs.year }} | Kontrollerat: ${{ steps.week.outputs.stockholm_time }}"
-                  }
-                ]
-              }
-            ]
+            "text": "😔 Ingen Min Stora Dag idag - Vecka ${{ steps.week.outputs.week }}, ${{ steps.week.outputs.year }} | Kontrollerat: ${{ steps.week.outputs.stockholm_time }}"
           }
       env:
         SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
